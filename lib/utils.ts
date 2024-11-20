@@ -48,7 +48,22 @@ export const getEndpoints = (filePath: string, fileName: string): string[] => {
         return services
     } catch (e) {
         console.log(e)
-        throw new Error('getAccountIds: Cannot read file')
+        throw new Error('getEndpoints: Cannot read file')
     }
 
+}
+
+interface Repo {
+    repo: string
+}
+
+export const getRepo = (filePath: string, fileName: string): string => {
+    try {
+        const fileContents = fs.readFileSync(getFullFilePath(filePath, fileName), 'utf8')
+        const data = yaml.load(fileContents) as Repo[]
+        return data[0].repo
+    } catch (e) {
+        console.log(e)
+        throw new Error('getRepo: Cannot read file')
+    }
 }

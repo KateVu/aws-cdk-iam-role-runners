@@ -1,4 +1,4 @@
-import { Stack, StackProps } from 'aws-cdk-lib';
+import { CfnOutput, Stack, StackProps } from 'aws-cdk-lib';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import { Construct } from 'constructs';
 
@@ -7,6 +7,7 @@ interface IamRoleRunnersStackPros extends StackProps {
   accountId: string,
   accountName: string,
   envName: string,
+  repo: string
 }
 
 export class IamRoleRunnersStack extends Stack {
@@ -32,7 +33,7 @@ export class IamRoleRunnersStack extends Stack {
         githubOidcProvider.openIdConnectProviderArn,
         {
           StringLike: { 
-            'token.actions.githubusercontent.com:sub': 'repo:KateVu/aws-cdk*',
+            'token.actions.githubusercontent.com:sub': `repo:${props.repo}`,
             'token.actions.githubusercontent.com:aud': 'sts.amazonaws.com',
           },            
         },
@@ -41,6 +42,12 @@ export class IamRoleRunnersStack extends Stack {
       managedPolicies: [
         iam.ManagedPolicy.fromAwsManagedPolicyName('AdministratorAccess'),
       ],      
-    })    
+    })
+    
+    new CfnOutput(this, `${this.stackName}-ec2`, {
+      value: githubActionsDeploymentRole.roleName,
+      exportName: `${this.stackName}-rolename`
+  })
+
   }
 }
